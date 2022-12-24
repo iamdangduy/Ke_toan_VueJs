@@ -48,11 +48,64 @@ th {
 }
 
 .tr-employee-data:hover {
-  background-color: #99DAD0;
+  background-color: #99dad0;
   cursor: pointer;
 }
 
 .btn-delete {
   text-align: center;
   color: #004137;
+}
+
+.btn-dropdown {
+  background: url("../assets/img/Sprites.64af8f61.svg") no-repeat -371px -364px;
+  width: 10px;
+  height: 8px;
+}
+
+.btn-fix-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.btn-dropdown:hover .dropdown__menu {
+  display: block;
+  transition: 2s;
+}
+
+.dropdown__menu {
+  position: relative;
+  left: -90px;
+  /* right: 0; */
+  top: 9px;
+  width: 125px;
+  height: 111px;
+  background-color: #ffffff;
+  border: 1px solid #016253;
+  border-radius: 4px;
+  padding: 8px 7px;
+  box-sizing: border-box;
+  display: none;
+}
+
+.dropdown__menu--duplicated,
+.dropdown__menu--delete,
+.dropdown__menu--stop {
+  height: 32px;
+  width: calc(100% - 8px);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 8px;
+  font-size: 14px;
+  font-weight: 450;
+}
+
+.dropdown__menu--duplicated:hover,
+.dropdown__menu--delete:hover,
+.dropdown__menu--stop:hover {
+  color: #016253;
+  background-color: #eff2f4;
 }

@@ -1,20 +1,17 @@
 <template>
   <div class="main">
     <TheHeader></TheHeader>
-    <ThePopup></ThePopup>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 import TheHeader from "./TheHeader.vue";
-import ThePopup from "./ThePopup.vue";
 export default {
   name: "TheMain",
   components: {
     TheHeader,
-    ThePopup
-},
+  },
 };
 </script>
 

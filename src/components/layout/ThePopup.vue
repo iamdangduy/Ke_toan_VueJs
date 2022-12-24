@@ -3,23 +3,20 @@
     <div class="popup__main">
       <div class="popup__main--title">
         <h1 style="font-size: 24px; font-weight: 700; margin: 0">Thông báo</h1>
-        <div class="main__title--close" v-on:click="closeDialog('popup')"></div>
+        <div class="main__title--close" @click="closePopup"></div>
       </div>
       <div class="popup__main--content">
         <p>Tài liệu bạn chọn sẽ bị xoá?</p>
       </div>
       <!-- <hr /> -->
       <div class="popup__main--footer">
-        <button class="btn-delete-user" v-on:click="deleteUser()">
-          Đồng ý
-        </button>
+        <button class="btn-delete-user" @click="deleteUser">Đồng ý</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import $ from "jquery";
 export default {
   name: "ThePopup",
   methods: {
@@ -27,10 +24,9 @@ export default {
      * Hàm đóng popup
      * Author: Duy
      */
-    closeDialog: function (isDisplay) {
+    closePopup() {
       try {
-        //Set style popup = none
-        document.querySelector(`.${isDisplay}`).style.display = "none";
+        this.$emit("onClosePopup");
       } catch (error) {
         console.log(error);
       }
@@ -40,25 +36,10 @@ export default {
      * Hàm delete nhân viên qua id
      * Author: Duy
      */
-    deleteUser: function () {
+    deleteUser() {
       try {
-        let idEmployeeList = document.querySelectorAll(".id-employee");
-        let id = "";
-        for (let i = 0; i < idEmployeeList.length; i++) {
-          //Lấy ra giá trị của ID Employee
-          id = $(idEmployeeList[i]).attr("EmployeeId");
-        }
-        //Hàm xoá theo id
-        $.ajax({
-          type: "DELETE",
-          url: `https://amis.manhnv.net/api/v1/Employees/${id}`,
-          success: function () {
-            console.log("Success!!");
-          },
-          error: function (error) {
-            console.log(error);
-          },
-        });
+        this.$emit("acceptDeleteUser");
+        this.$emit("onClosePopup");
       } catch (error) {
         console.log(error);
       }

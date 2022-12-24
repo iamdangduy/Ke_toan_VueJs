@@ -34,12 +34,12 @@
                     class="input-id"
                     type="text"
                     placeholder="NV-1644"
-                    m-required=""
+                    m-required
                     tabindex="1"
                     bus="EmployeeCode"
                   />
                 </div>
-                <!-- <div class="error-notification">Mã không để trống</div> -->
+                <div class="error-notification error-id">Mã không để trống</div>
               </div>
               <div class="row__input input2">
                 <div class="row__input--label">Tên <span>*</span></div>
@@ -48,14 +48,14 @@
                     type="text"
                     v-model="newEmployee.FullName"
                     class="label-name-employee"
-                    m-required=""
+                    m-required
                     tabindex="2"
                     bus="EmployeeName"
                   />
                 </div>
-                <!-- <div class="error-notification">
-                    Họ tên không được để trống
-                  </div> -->
+                <div class="error-notification error-name">
+                  Họ tên không được để trống
+                </div>
               </div>
             </div>
             <div class="row__right">
@@ -69,15 +69,30 @@
                 <div class="row__input--label">Giới tính</div>
                 <div class="row__input--radio">
                   <div class="input__radio--row">
-                    <input type="radio" class="radio-input" tabindex="6" />
+                    <input
+                      type="radio"
+                      name="gender"
+                      class="radio-input"
+                      tabindex="6"
+                    />
                     <div class="radio__label">Nam</div>
                   </div>
                   <div class="input__radio--row">
-                    <input type="radio" class="radio-input" tabindex="7" />
+                    <input
+                      type="radio"
+                      name="gender"
+                      class="radio-input"
+                      tabindex="7"
+                    />
                     <div class="radio__label">Nữ</div>
                   </div>
                   <div class="input__radio--row">
-                    <input type="radio" class="radio-input" tabindex="8" />
+                    <input
+                      type="radio"
+                      name="gender"
+                      class="radio-input"
+                      tabindex="8"
+                    />
                     <div class="radio__label">Khác</div>
                   </div>
                 </div>
@@ -175,9 +190,11 @@
               <div class="row__input--label">Email</div>
               <div class="row__input--input">
                 <input
+                  class="input-email"
                   type="text"
                   placeholder="nguyendangduy@gmail.com"
                   tabindex="15"
+                  v-model="newEmployee.Email"
                 />
               </div>
             </div>
@@ -214,11 +231,7 @@
           </button>
         </div>
         <div class="dialog__footer-right">
-          <button
-            class="btn-hide"
-            v-on:click="closeDialog('dialog')"
-            tabindex="20"
-          >
+          <button class="btn-hide" @click="btnAddAndClose" tabindex="20">
             Cất
           </button>
           <button
@@ -231,23 +244,26 @@
         </div>
       </div>
     </div>
+    <TheToast v-if="isShowToast"></TheToast>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import TheToast from "../base/TheToast.vue";
 export default {
   name: "TheDialog",
   props: ["employee", "employeeId"],
-
   created() {
+    this.$nextTick(function () {
+      this.$refs.EmployeeCode.focus();
+    });
     if (!this.isValueEmpty(this.employeeId)) {
-      console.log("Add dữ liệu!");
+      console.log("add dữ liệu");
     } else {
       this.getEmployeeWithId();
     }
   },
-
   data() {
     return {
       newEmployee: {},
@@ -255,15 +271,40 @@ export default {
   },
   methods: {
     /**
+     * Hàm cất dữ liệu bao gồm thêm data, validate và đóng form khi thêm thành công
+     * Author: Duy
+     */
+    btnAddAndClose() {
+      try {
+        this.validateDialog();
+        let isValid = this.validateDialog();
+        if (isValid) {
+          console.log(this.newEmployee);
+          axios
+            .post(
+              "https://cukcuk.manhnv.net/api/v1/Employees",
+              this.newEmployee
+            )
+            .then((res) => {
+              console.log(res);
+              //gửi dữ liệu yêu cầu load lại data cho parent
+              this.closeDialog();
+              this.$emit("reload-data");
+            })
+            .catch((error) => console.log(error));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
      * Hàm xoá dữ liệu khi click vào btn Huỷ
      * Author: Duy
      */
     btnCancel() {
       try {
-        this.newEmployee = {};
-        this.$nextTick(function () {
-          this.$refs.EmployeeCode.focus();
-        });
+        // this.newEmployee = {};
+        this.closeDialog();
       } catch (error) {
         console.log(error);
       }
@@ -290,7 +331,6 @@ export default {
         console.log(error);
       }
     },
-
     /**
      * Hàm save dữ liệu sau khi sửa hoặc thêm
      * Author: Duy
@@ -308,10 +348,13 @@ export default {
               )
               .then((res) => {
                 console.log(res);
-                alert("Thêm mới thành công");
+                //hiện toast báo thành công
+                this.isShowToast = true;
                 //gửi dữ liệu yêu cầu load lại data cho parent
+                setTimeout((this.isShowToast = false), 5000);
                 this.$emit("reload-data");
-                this.closeDialog();
+
+                this.newEmployee = {};
               })
               .catch((error) => {
                 console.log(error);
@@ -325,17 +368,19 @@ export default {
               )
               .then((res) => {
                 console.log(res);
-                alert("Sửa thành công");
+                //hiện toast báo thành công
+                this.isShowToast = true;
                 //gửi dữ liệu yêu cầu load lại data cho parent
                 this.$emit("reload-data");
-                this.closeDialog();
+                setTimeout((this.isShowToast = false), 5000);
+
+                this.newEmployee = {};
               })
               .catch((error) => {
                 console.log(error);
               });
           }
         }
-
         //add dữ liệu
       } catch (error) {
         console.log(error);
@@ -358,13 +403,29 @@ export default {
         //mã nv không được để trống
         if (this.isValueEmpty(this.newEmployee.EmployeeCode) == false) {
           errors.push("Mã nhân viên không được trống");
+          document.querySelector(".input-id").classList.add("input--error");
+          document.querySelector(".error-id").style.display = "block";
+        } else {
+          document.querySelector(".input-id").classList.remove("input--error");
+          document.querySelector(".error-id").style.display = "none";
         }
-
         //tên không đưỢc để trống
         if (this.isValueEmpty(this.newEmployee.FullName) == false) {
           errors.push("Tên nhân viên không được trống");
+          document
+            .querySelector(".label-name-employee")
+            .classList.add("input--error");
+          document.querySelector(".error-name").style.display = "block";
+        } else {
+          document
+            .querySelector(".label-name-employee")
+            .classList.remove("input--error");
+          document.querySelector(".error-name").style.display = "none";
         }
-
+        // console.log(this.newEmployee.Email);
+        if (/^[^@]+@\w+(\.\w+)+\w$/.test(this.newEmployee.Email)) {
+          console.log("Work!!");
+        }
         if (errors.length > 0) {
           return false;
         } else {
@@ -374,7 +435,6 @@ export default {
         console.log(error);
       }
     },
-
     /**
      * Hàm kiểm tra trường trống
      * Author: Duy
@@ -391,10 +451,12 @@ export default {
       }
     },
   },
+  components: { TheToast },
 };
 </script>
 
 <style scoped>
 /* @import url("../../css/formadd.css"); */
 @import url(../../css/input.css);
+@import url(../../css/error.css);
 </style>

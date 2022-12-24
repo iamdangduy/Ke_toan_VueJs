@@ -65,7 +65,18 @@
                 <td></td>
                 <td></td>
                 <td>
-                  <div class="btn-delete">Xoá</div>
+                  <div class="btn-fix-dropdown">
+                    <div class="btn-fix">Sửa</div>
+                    <div class="btn-dropdown">
+                      <div class="dropdown__menu">
+                        <div class="dropdown__menu--duplicated">Nhân bản</div>
+                        <div class="dropdown__menu--delete" @click="deleteUser">
+                          Xoá
+                        </div>
+                        <div class="dropdown__menu--stop">Ngừng sử dụng</div>
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -100,7 +111,23 @@
               <td></td>
               <td></td>
               <td>
-                <div class="btn-delete" v-on:click="showPopup()">Xoá</div>
+                <div class="btn-delete">
+                  <div class="btn-fix-dropdown">
+                    <div class="btn-fix" @click="onDbClick(employee)">Sửa</div>
+                    <div class="btn-dropdown">
+                      <div class="dropdown__menu">
+                        <div class="dropdown__menu--duplicated">Nhân bản</div>
+                        <div
+                          class="dropdown__menu--delete"
+                          @click="showPopup(employee)"
+                        >
+                          Xoá
+                        </div>
+                        <div class="dropdown__menu--stop">Ngừng sử dụng</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           </table>
@@ -113,6 +140,11 @@
           ></TheDialog>
         </div>
         <ThePagination></ThePagination>
+        <ThePopup
+          v-if="isShowPopup"
+          @onClosePopup="closePopup"
+          @acceptDeleteUser="deleteUser"
+        ></ThePopup>
         <TheLoad v-if="isLoading"></TheLoad>
       </div>
     </div>
@@ -123,12 +155,16 @@
 import axios from "axios";
 import TheDialog from "./TheDialog.vue";
 import TheLoad from "./TheLoad.vue";
+import ThePagination from "./ThePagination.vue";
+import ThePopup from "./ThePopup.vue";
 export default {
   name: "TheTable",
   components: {
     TheDialog,
     TheLoad,
-  },
+    ThePopup,
+    ThePagination
+},
   data() {
     return {
       employees: [],
@@ -137,9 +173,33 @@ export default {
       employeeSelected: null,
       employeeSelectedId: null,
       isLoading: false,
+      isShowPopup: false,
     };
   },
   methods: {
+    /**
+     * Hàm delete user theo id
+     * Author: Duy
+     */
+    deleteUser() {
+      try {
+        this.isLoading = true;
+        this.isShowPopup = false;
+        console.log(this.employeeSelected.EmployeeId);
+        axios
+          .delete(
+            `https://cukcuk.manhnv.net/api/v1/Employees/${this.employeeSelected.EmployeeId}`
+          )
+          .then((res) => {
+            console.log(res);
+            this.loadData();
+          })
+          .then(setTimeout((this.isLoading = false), 1000))
+          .catch((error) => console.log(error));
+      } catch (error) {
+        console.log(error);
+      }
+    },
     /**
      * Hàm double click hiển thị thông tin nhân viên
      * Author: Duy
@@ -184,9 +244,22 @@ export default {
      * Hàm hiển thị popup khi click vào xoá dữ liệu
      * Author: Duy
      */
-    showPopup() {
+    showPopup(employee) {
       try {
-        document.querySelector(".popup").style.display = "flex";
+        this.isShowPopup = true;
+        this.employeeSelected = employee;
+        console.log(this.employeeSelected);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    /**
+     * Hàm đóng popup
+     */
+    closePopup() {
+      try {
+        this.isShowPopup = false;
       } catch (error) {
         console.log(error);
       }
@@ -232,11 +305,10 @@ export default {
         });
     },
   },
-
   created() {
+    this.loadData();
     //gọi hàm load data
     console.log("created");
-    this.loadData();
   },
 };
 </script>
