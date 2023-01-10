@@ -2,11 +2,16 @@
   <div class="popup">
     <div class="popup__main">
       <div class="popup__main--title">
-        <h1 style="font-size: 24px; font-weight: 700; margin: 0">Thông báo</h1>
+        <div class="popup__main--left">
+          <div class="main__title--logo"></div>
+          <h1 style="font-size: 24px; font-weight: 700; margin: 0">
+            Thông báo
+          </h1>
+        </div>
         <div class="main__title--close" @click="closePopup"></div>
       </div>
       <div class="popup__main--content">
-        <p>Tài liệu bạn chọn sẽ bị xoá?</p>
+        <p>{{ text }}</p>
       </div>
       <!-- <hr /> -->
       <div class="popup__main--footer">
@@ -19,6 +24,9 @@
 <script>
 export default {
   name: "ThePopup",
+  props: {
+    text: String,
+  },
   methods: {
     /**
      * Hàm đóng popup

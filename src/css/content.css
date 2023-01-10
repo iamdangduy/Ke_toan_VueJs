@@ -33,8 +33,33 @@
   align-items: center;
   padding: 12px 20px;
   box-sizing: border-box;
-  flex-direction: row-reverse;
+  /* flex-direction: row-reverse; */
+  justify-content: space-between;
 }
+
+.main__right {
+  display: flex;
+  align-items: center;
+}
+
+.main__left {
+  display: flex;
+}
+
+.main__left--undo {
+  color: red;
+  font-weight: 400;
+  margin-left: 12px;
+}
+
+.main__left--undo:hover {
+  cursor: pointer;
+}
+
+.main__left--selected {
+  font-weight: 400;
+}
+
 
 .main__refresh {
   width: 36px;

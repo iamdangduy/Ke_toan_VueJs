@@ -8,6 +8,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
   /* display: none; */
 }
 
@@ -27,6 +28,18 @@
   padding: 24px;
   box-sizing: border-box;
   /* border: 1px solid ; */
+}
+
+.main__title--logo {
+  background: url('../assets/img/Sprites.64af8f61.svg') no-repeat -598px -463px;
+	width: 36px;
+	height: 37px;
+  margin-right: 8px;
+}
+
+.popup__main--left {
+  display: flex;
+  align-items: center;
 }
 
 .main__title--close {

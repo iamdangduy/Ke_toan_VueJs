@@ -13,31 +13,64 @@
     <div class="sidebar__tools">
       <div class="tools-item">
         <router-link to="/">
-          <MenuItem text="Tổng quan" className="item__logo item1"></MenuItem>
+          <MenuItem
+            :text="EmployeeRS.Overview"
+            className="item__logo item1"
+          ></MenuItem>
         </router-link>
-        <MenuItem text="Tiền mặt" className="item__logo item2"></MenuItem>
-        <MenuItem text="Tiền gửi" className="item__logo item3"></MenuItem>
-        <MenuItem text="Mua hàng" className="item__logo item4"></MenuItem>
-        <MenuItem text="Bán hàng" className="item__logo item5"></MenuItem>
         <MenuItem
-          text="Quản lí hoá đơn"
+          :text="EmployeeRS.Cash"
+          className="item__logo item2"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.Banking"
+          className="item__logo item3"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.Purchase"
+          className="item__logo item4"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.Sales"
+          className="item__logo item5"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.InvoiceManaging"
           className="item__logo item6"
         ></MenuItem>
-        <MenuItem text="Kho" className="item__logo item7"></MenuItem>
         <MenuItem
-          text="Công cụ dụng cụ"
+          :text="EmployeeRS.Inventory"
+          className="item__logo item7"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.Equipments"
           className="item__logo item8"
         ></MenuItem>
         <MenuItem
-          text="Tài sản cố định"
+          :text="EmployeeRS.FixedAssets"
           className="item__logo item9"
         ></MenuItem>
-        <MenuItem text="Thuế" className="item__logo item10"></MenuItem>
-        <MenuItem text="Giá thành" className="item__logo item11"></MenuItem>
-        <MenuItem text="Tổng hợp" className="item__logo item12"></MenuItem>
-        <MenuItem text="Ngân sách" className="item__logo item13"></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.Tax"
+          className="item__logo item10"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.CostOfProduction"
+          className="item__logo item11"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.General"
+          className="item__logo item12"
+        ></MenuItem>
+        <MenuItem
+          :text="EmployeeRS.Budget"
+          className="item__logo item13"
+        ></MenuItem>
         <router-link to="/report">
-          <MenuItem text="Báo cáo" className="item__logo item14"></MenuItem>
+          <MenuItem
+            :text="EmployeeRS.Report"
+            className="item__logo item14"
+          ></MenuItem>
         </router-link>
       </div>
     </div>
@@ -46,8 +79,14 @@
 
 <script>
 import MenuItem from "../base/MenuItem.vue";
+import EmployeeRS from "@/resourse/vn";
 export default {
   name: "TheSidebar",
+  data() {
+    return {
+      EmployeeRS,
+    };
+  },
   components: {
     MenuItem,
   },

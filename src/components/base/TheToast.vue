@@ -3,7 +3,7 @@
       <div class="toast__left">
         <div class="toast__logo"></div>
         <div class="toast__text">
-          <b style="color: #01836F;">Thành công!</b> Công việc đã bị xoá.
+          <b style="color: #01836F;">Thành công!</b> {{text}}
         </div>
       </div>
       <div class="toast__close"></div>
@@ -13,6 +13,9 @@
 <script>
 export default {
   name: "TheToast",
+  props: {
+    text: String,
+  }
 };
 </script>
 

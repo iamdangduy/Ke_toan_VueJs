@@ -1,0 +1,38 @@
+span {
+  color: black;
+}
+
+
+input.el-input__inner {
+  color: black;
+}
+
+.el-input__wrapper {
+  border: 1px solid #016253;
+}
+
+.el-input__wrapper:focus-visible {
+  border: 0px;
+  outline: none;
+}
+
+input.el-input__inner:focus {
+  border: 0px;
+}
+
+div.el-form-item.asterisk-left {
+  margin-bottom: 0px;
+}
+
+.el-select {
+  width: 100%;
+  border-radius: 4px;
+}
+
+div.el-input__wrapper {
+  height: 32px;
+}
+
+.demo-form-inline {
+  outline: none;
+}

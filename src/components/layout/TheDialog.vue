@@ -1,8 +1,14 @@
 <template>
   <div class="dialog">
+    <ThePopup
+      :text="this.userMsg"
+      @onClosePopup="closePopup"
+      @acceptDeleteUser="closePopup"
+      v-if="isShowPopup"
+    ></ThePopup>
     <div class="add-form">
       <div class="dialog__header">
-        <p class="dialog__title">Thêm mới nhân viên</p>
+        <p class="dialog__title">{{ text }}</p>
         <div class="confirm__role">
           <div class="role__employee">
             <input type="checkbox" name="" id="input-checkbox" />
@@ -26,14 +32,14 @@
           <div class="dialog__row--item">
             <div class="row__left">
               <div class="row__input input1">
-                <div class="row__input--label">Mã <span>*</span></div>
+                <div class="row__input--label">Mã <span class="required-field">*</span></div>
                 <div class="row__input--input">
                   <input
                     v-model="newEmployee.EmployeeCode"
                     ref="EmployeeCode"
+                    :class="{ errorInput: isErrorInputCode }"
                     class="input-id"
                     type="text"
-                    placeholder="NV-1644"
                     m-required
                     tabindex="1"
                     bus="EmployeeCode"
@@ -42,12 +48,13 @@
                 <div class="error-notification error-id">Mã không để trống</div>
               </div>
               <div class="row__input input2">
-                <div class="row__input--label">Tên <span>*</span></div>
+                <div class="row__input--label">Tên <span class="required-field">*</span></div>
                 <div class="row__input--input">
                   <input
                     type="text"
                     v-model="newEmployee.FullName"
                     class="label-name-employee"
+                    :class="{ errorInput: isErrorInputName }"
                     m-required
                     tabindex="2"
                     bus="EmployeeName"
@@ -62,7 +69,7 @@
               <div class="row__input input1">
                 <div class="row__input--label">Ngày sinh</div>
                 <div class="row__input--input">
-                  <input type="date" placeholder="NV-1644" tabindex="5" />
+                  <input type="date" tabindex="5" />
                 </div>
               </div>
               <div class="row__input input2">
@@ -104,30 +111,37 @@
           <div class="dialog__row--item">
             <div class="row__left">
               <div class="row__input">
-                <div class="row__input--label">Đơn vị <span>*</span></div>
-                <select
-                  v-model="newEmployee.DepartmentId"
+                <div class="row__input--label">Đơn vị <span class="required-field">*</span></div>
+                <ComboboxInput
+                  tabindex="3"
+                  @getDepartmentID = "handleDepartmentID"
+                  :class="{ errorInput: isErrorInputDepartment }"
+                  :value="newEmployee.departmentID"
+                ></ComboboxInput>
+                <!-- <select
                   bus="DepartmentId"
                   class="dropdown"
+                  :class="{ errorInput: isErrorInputDepartment }"
                   name="cars"
                   id="cars"
                   tabindex="3"
+                  v-model="newEmployee.DepartmentId"
                 >
-                  <option value="715ba47e-1e30-3be8-458f-4d82f3a13455">
+                  <option value="3f8e6896-4c7d-15f5-a018-75d8bd200d7c">
                     Phòng nhân sự
                   </option>
                   <option value="45ac3d26-18f2-18a9-3031-644313fbb055">
                     Phòng hành chính
                   </option>
                   <option value="mercedes">Mercedes</option>
-                </select>
+                </select> -->
               </div>
             </div>
             <div class="row__right">
               <div class="row__input input-id">
                 <div class="row__input--label id-label">
                   Số CMND
-                  <div class="identity">Số Chứng Minh Nhân Dân</div>
+                  <TooltipHover text="Số chứng minh nhân dân"></TooltipHover>
                 </div>
                 <div class="row__input--input">
                   <input type="text" tabindex="9" />
@@ -136,11 +150,7 @@
               <div class="row__input input-date">
                 <div class="row__input--label">Ngày cấp</div>
                 <div class="row__input--input">
-                  <input
-                    type="date"
-                    placeholder="Nguyễn Thị Ánh Bằng"
-                    tabindex="10"
-                  />
+                  <input type="date" tabindex="10" />
                 </div>
               </div>
             </div>
@@ -175,27 +185,33 @@
         <div class="dialog__row">
           <div class="dialog__row--grid">
             <div class="dialog__row--col">
-              <div class="row__input--label">ĐT di động</div>
+              <div class="row__input--label id-label">
+                ĐT di động
+                <TooltipHover text="Điện thoại di động"></TooltipHover>
+              </div>
               <div class="row__input--input">
-                <input type="text" placeholder="0333133942" tabindex="13" />
+                <input type="text" tabindex="13" />
               </div>
             </div>
             <div class="dialog__row--col">
               <div class="row__input--label">ĐT cố định</div>
               <div class="row__input--input">
-                <input type="text" placeholder="(764) 749-6478" tabindex="14" />
+                <input type="text" tabindex="14" />
               </div>
             </div>
             <div class="dialog__row--col">
               <div class="row__input--label">Email</div>
               <div class="row__input--input">
                 <input
+                  v-model="newEmployee.Email"
+                  :class="{ errorInput: isErrorInputEmail }"
                   class="input-email"
                   type="text"
-                  placeholder="nguyendangduy@gmail.com"
                   tabindex="15"
-                  v-model="newEmployee.Email"
                 />
+                <div class="error-notification error-email">
+                  Email không được để trống
+                </div>
               </div>
             </div>
           </div>
@@ -244,22 +260,32 @@
         </div>
       </div>
     </div>
-    <TheToast v-if="isShowToast"></TheToast>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import TheToast from "../base/TheToast.vue";
+import ComboboxInput from "../base/ComboboxInput.vue";
+import TooltipHover from "../base/TooltipHover.vue";
+import ThePopup from "./ThePopup.vue";
 export default {
   name: "TheDialog",
-  props: ["employee", "employeeId"],
+  props: ["employee", "employeeId", "text"],
+
   created() {
     this.$nextTick(function () {
       this.$refs.EmployeeCode.focus();
     });
     if (!this.isValueEmpty(this.employeeId)) {
       console.log("add dữ liệu");
+      //nếu dialog khởi tạo rỗng thì tự động lấy mã nhân viên mới.
+      axios
+        .get("https://cukcuk.manhnv.net/api/v1/Employees/NewEmployeeCode")
+        .then((res) => {
+          document.querySelector(".input-id").value = res.data;
+          this.newEmployee.EmployeeCode = res.data;
+        })
+        .catch((error) => console.log(error));
     } else {
       this.getEmployeeWithId();
     }
@@ -267,9 +293,43 @@ export default {
   data() {
     return {
       newEmployee: {},
+      isErrorInputDepartment: false,
+      isErrorInputName: false,
+      isErrorInputCode: false,
+      isErrorInputEmail: false,
+      userMsg: "",
+      isShowPopup: false,
     };
   },
+  components: {
+    TooltipHover,
+    ThePopup,
+    ComboboxInput,
+  },
   methods: {
+    /**
+     * Hàm lấy id phòng ban từ combobox
+     */
+    handleDepartmentID(valueDepartment) {
+      try {
+        this.newEmployee.DepartmentId = valueDepartment;
+        console.log(this.newEmployee.DepartmentId);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    /**
+     * Hàm đóng popup
+     * Author: Duy
+     */
+    closePopup() {
+      try {
+        this.isShowPopup = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     /**
      * Hàm cất dữ liệu bao gồm thêm data, validate và đóng form khi thêm thành công
      * Author: Duy
@@ -289,9 +349,16 @@ export default {
               console.log(res);
               //gửi dữ liệu yêu cầu load lại data cho parent
               this.closeDialog();
+              //gọi toast thông báo
+              this.$emit("callToast");
               this.$emit("reload-data");
             })
-            .catch((error) => console.log(error));
+            .catch((error) => {
+              this.userMsg = error.response.data.userMsg;
+              console.log(error.response.data.userMsg);
+
+              this.isShowPopup = true;
+            });
         }
       } catch (error) {
         console.log(error);
@@ -348,12 +415,9 @@ export default {
               )
               .then((res) => {
                 console.log(res);
-                //hiện toast báo thành công
-                this.isShowToast = true;
-                //gửi dữ liệu yêu cầu load lại data cho parent
-                setTimeout((this.isShowToast = false), 5000);
+                //gọi toast thông báo
+                this.$emit("callToast");
                 this.$emit("reload-data");
-
                 this.newEmployee = {};
               })
               .catch((error) => {
@@ -368,12 +432,11 @@ export default {
               )
               .then((res) => {
                 console.log(res);
-                //hiện toast báo thành công
-                this.isShowToast = true;
                 //gửi dữ liệu yêu cầu load lại data cho parent
+                console.log("thêm và đóng thành công");
+                //gọi toast thêm mới thành công
+                this.$emit("callToast");
                 this.$emit("reload-data");
-                setTimeout((this.isShowToast = false), 5000);
-
                 this.newEmployee = {};
               })
               .catch((error) => {
@@ -403,28 +466,40 @@ export default {
         //mã nv không được để trống
         if (this.isValueEmpty(this.newEmployee.EmployeeCode) == false) {
           errors.push("Mã nhân viên không được trống");
-          document.querySelector(".input-id").classList.add("input--error");
+          this.isErrorInputCode = true;
           document.querySelector(".error-id").style.display = "block";
         } else {
-          document.querySelector(".input-id").classList.remove("input--error");
+          this.isErrorInputCode = false;
           document.querySelector(".error-id").style.display = "none";
         }
         //tên không đưỢc để trống
         if (this.isValueEmpty(this.newEmployee.FullName) == false) {
           errors.push("Tên nhân viên không được trống");
-          document
-            .querySelector(".label-name-employee")
-            .classList.add("input--error");
+          this.isErrorInputName = true;
           document.querySelector(".error-name").style.display = "block";
         } else {
-          document
-            .querySelector(".label-name-employee")
-            .classList.remove("input--error");
+          this.isErrorInputName = false;
           document.querySelector(".error-name").style.display = "none";
         }
-        // console.log(this.newEmployee.Email);
-        if (/^[^@]+@\w+(\.\w+)+\w$/.test(this.newEmployee.Email)) {
-          console.log("Work!!");
+        //email không được để trống
+        if (this.isValueEmpty(this.newEmployee.Email) == false) {
+          errors.push("Email không được trống");
+          this.isErrorInputEmail = true;
+          document.querySelector(".error-email").style.display = "block";
+        } else {
+          this.isErrorInputEmail = false;
+          document.querySelector(".error-email").style.display = "none";
+        }
+        //mã phòng ban không được để trống
+        if (this.isValueEmpty(this.newEmployee.DepartmentId) == false) {
+          errors.push("Phòng ban không được trống");
+          document.querySelector(".el-input__wrapper").style.borderColor =
+            "red";
+          this.isErrorInputDepartment = true;
+        } else {
+          this.isErrorInputDepartment = false;
+          document.querySelector(".el-input__wrapper").style.borderColor =
+            "green";
         }
         if (errors.length > 0) {
           return false;
@@ -451,7 +526,6 @@ export default {
       }
     },
   },
-  components: { TheToast },
 };
 </script>
 

@@ -5,13 +5,13 @@ input {
   border: 1px solid #016253;
   border-radius: 4px;
   width: 100%;
-  /* outline: #016253; */
 }
 
 input:focus {
+  border: 2px solid green;
   outline: none;
-  border: 2px solid #01836f;
 }
+
 
 .dropdown {
   height: 36px;

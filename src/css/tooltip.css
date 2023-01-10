@@ -1,0 +1,18 @@
+.tooltip {
+    background-color: #00201b;
+    width: fit-content;
+    padding: 4px;
+    position: absolute;
+    top: -1px;
+    left: 0px;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 400;
+    display: none;
+    align-items: center;
+  }
+  
+  .id-label:hover .tooltip {
+    display: flex;
+  }

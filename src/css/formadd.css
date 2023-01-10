@@ -205,24 +205,6 @@ span {
   width: calc(100% - 8px);
 }
 
-.identity {
-  background-color: #00201b;
-  width: fit-content;
-  padding: 4px;
-  position: absolute;
-  top: -1px;
-  left: 0px;
-  border-radius: 4px;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 400;
-  display: none;
-}
-
-.id-label:hover .identity {
-  display: block;
-}
-
 .btn-hide-and-add {
   margin-left: 8px;
 }

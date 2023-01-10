@@ -1,4 +1,4 @@
-.input--error {
+.errorInput {
     border-color: red;
     margin: 0;
 }
@@ -15,4 +15,8 @@
     font-weight: 400;
     margin-top: 2px;
     display: none;
+}
+
+.required-field {
+    color: red;
 }
