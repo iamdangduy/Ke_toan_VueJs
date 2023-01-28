@@ -5,9 +5,9 @@
         <el-option
           v-for="(department, index) in departments"
           :key="index"
-          :label="department.DepartmentName"
-          :value="department.DepartmentId"
-          @click="selectedDepartment(department.DepartmentId)"
+          :label="department.departmentName"
+          :value="department.departmentID"
+          @click="selectedDepartment(department.departmentID)"
         />
       </el-select>
     </el-form-item>
@@ -24,6 +24,7 @@ export default {
       departmentSelected: "",
     };
   },
+  props: ["departmentName"],
   methods: {
     /**
      * Hàm lấy dữ liệu department vừa select
@@ -32,7 +33,7 @@ export default {
     selectedDepartment(valueDepartment) {
       try {
         this.departmentSelected = valueDepartment;
-        this.$emit('getDepartmentID', valueDepartment);
+        this.$emit("getDepartmentID", valueDepartment);
         // console.log(valueDepartment);
       } catch (error) {
         console.log(error);
@@ -41,9 +42,13 @@ export default {
   },
   created() {
     axios
-      .get("https://cukcuk.manhnv.net/api/v1/Departments")
+      .get("https://localhost:7067/api/v1/Departments")
       .then((res) => (this.departments = res.data))
       .catch((error) => console.log(error));
+  },
+
+  beforeUpdate() {
+    this.departmentSelected = this.departmentName;
   },
 };
 </script>

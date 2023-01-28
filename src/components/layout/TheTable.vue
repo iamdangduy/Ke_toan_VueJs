@@ -40,7 +40,7 @@
                 <th>
                   <input type="checkbox" class="checkbox-input" />
                 </th>
-                <th style="width: 100px">{{EmployeeRS.EmployeeID}}</th>
+                <th style="width: 100px">{{ EmployeeRS.EmployeeID }}</th>
                 <th style="width: 200px">{{ EmployeeRS.EmployeeName }}</th>
                 <th>{{ EmployeeRS.Gender }}</th>
                 <th class="dob">{{ EmployeeRS.DateOfBirth }}</th>
@@ -65,7 +65,7 @@
               <td>
                 <input
                   type="checkbox"
-                  :value="employee.EmployeeId"
+                  :value="employee.employeeId"
                   class="checkbox-input"
                   v-model="selectedUser"
                 />
@@ -74,33 +74,39 @@
                 class="id-employee"
                 employeeid="6c40eb98-7b91-11ed-9263-00163e06abee"
               >
-                {{ employee.EmployeeCode }}
+                {{ employee.employeeCode }}
               </td>
-              <td>{{ employee.FullName }}</td>
-              <td></td>
+              <td>{{ employee.employeeName }}</td>
+              <td>{{ this.formatGender(employee.gender) }}</td>
               <td class="dob">
-                {{ formatDate(employee.DateOfBirth) }}
+                {{ formatDate(employee.dateOfBirth) }}
               </td>
-              <td>001201005936</td>
+              <td>{{ employee.identityNumber }}</td>
               <td>Trưởng nhóm</td>
-              <td>{{ employee.DepartmentName }}</td>
+              <td>{{ employee.departmentName }}</td>
               <td></td>
               <td></td>
               <td></td>
               <td>
                 <div class="btn-delete">
                   <div class="btn-fix-dropdown">
-                    <div class="btn-fix" @click="onDbClick(employee)">{{ EmployeeRS.Fix }}</div>
+                    <div class="btn-fix" @click="onDbClick(employee)">
+                      {{ EmployeeRS.Fix }}
+                    </div>
                     <div class="btn-dropdown">
                       <div class="dropdown__menu">
-                        <div class="dropdown__menu--duplicated">{{ EmployeeRS.Duplicate }}</div>
+                        <div class="dropdown__menu--duplicated">
+                          {{ EmployeeRS.Duplicate }}
+                        </div>
                         <div
                           class="dropdown__menu--delete"
                           @click="showPopup(employee)"
                         >
                           {{ EmployeeRS.Delete }}
                         </div>
-                        <div class="dropdown__menu--stop">{{ EmployeeRS.StopUse }}</div>
+                        <div class="dropdown__menu--stop">
+                          {{ EmployeeRS.StopUse }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -118,7 +124,10 @@
             @callToast="showToastMessage"
           ></TheDialog>
         </div>
-        <ThePagination></ThePagination>
+        <ThePagination
+          :totalRecord="totalRecord"
+          @get-value-record="getValueRecord"
+        ></ThePagination>
         <ThePopup
           v-if="isShowPopup"
           text="Bạn có chắc muốn xoá?"
@@ -165,9 +174,34 @@ export default {
       selectedUser: [],
       textOfToastMessage: "",
       textTitleDialog: "",
+      totalRecord: "",
+      PageIndex: 1,
+      PageSize: 20,
     };
   },
   methods: {
+    /**
+     * Hàm lấy số lượng bản ghi trên 1 trang
+     * Author: Duy
+     */
+    getValueRecord(value) {
+      try {
+        console.log(value);
+        this.PageSize = value;
+        this.loadData();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Hàm format giới tính
+     * Author: Duy
+     */
+    formatGender(gender) {
+      if (gender == 0) return "Nam";
+      else if (gender == 1) return "Nữ";
+      else return "Khác";
+    },
     /**
      * Hàm xoá những select đã chọn
      * Author: Duy
@@ -202,10 +236,10 @@ export default {
       try {
         this.isLoading = true;
         this.isShowPopup = false;
-        console.log(this.employeeSelected.EmployeeId);
+        console.log(this.employeeSelected.employeeId);
         axios
           .delete(
-            `https://cukcuk.manhnv.net/api/v1/Employees/${this.employeeSelected.EmployeeId}`
+            `https://localhost:7067/api/v1/Employees/${this.employeeSelected.employeeId}`
           )
           .then((res) => {
             console.log(res);
@@ -228,7 +262,7 @@ export default {
         //hiển thị dialog
         this.displayDialog = true;
         this.employeeSelected = employee;
-        this.employeeSelectedId = employee.EmployeeId;
+        this.employeeSelectedId = employee.employeeId;
         this.textTitleDialog = "Sửa nhân viên";
       } catch (error) {
         console.log(error);
@@ -315,10 +349,15 @@ export default {
     loadData() {
       //sử dụng axios để get data
       axios
-        .get("https://cukcuk.manhnv.net/api/v1/Employees")
+        .get(
+          `https://localhost:7067/api/v1/Employees/filter?ms_PageIndex=${this.PageIndex}&ms_PageSize=${this.PageSize}`
+        )
         .then((this.isLoading = true))
         .then((res) => {
-          this.employees = res.data;
+          this.employees = res.data.records;
+          this.totalRecord = res.data.totalcount;
+          console.log(this.totalRecord);
+          console.log(this.employees);
           setTimeout((this.isLoading = false), 500);
         })
         .catch((e) => {

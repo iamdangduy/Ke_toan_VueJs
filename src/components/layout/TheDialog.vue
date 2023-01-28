@@ -32,10 +32,12 @@
           <div class="dialog__row--item">
             <div class="row__left">
               <div class="row__input input1">
-                <div class="row__input--label">Mã <span class="required-field">*</span></div>
+                <div class="row__input--label">
+                  Mã <span class="required-field">*</span>
+                </div>
                 <div class="row__input--input">
                   <input
-                    v-model="newEmployee.EmployeeCode"
+                    v-model="newEmployee.employeeCode"
                     ref="EmployeeCode"
                     :class="{ errorInput: isErrorInputCode }"
                     class="input-id"
@@ -48,11 +50,13 @@
                 <div class="error-notification error-id">Mã không để trống</div>
               </div>
               <div class="row__input input2">
-                <div class="row__input--label">Tên <span class="required-field">*</span></div>
+                <div class="row__input--label">
+                  Tên <span class="required-field">*</span>
+                </div>
                 <div class="row__input--input">
                   <input
                     type="text"
-                    v-model="newEmployee.FullName"
+                    v-model="newEmployee.employeeName"
                     class="label-name-employee"
                     :class="{ errorInput: isErrorInputName }"
                     m-required
@@ -111,12 +115,14 @@
           <div class="dialog__row--item">
             <div class="row__left">
               <div class="row__input">
-                <div class="row__input--label">Đơn vị <span class="required-field">*</span></div>
+                <div class="row__input--label">
+                  Đơn vị <span class="required-field">*</span>
+                </div>
                 <ComboboxInput
                   tabindex="3"
-                  @getDepartmentID = "handleDepartmentID"
+                  @getDepartmentID="handleDepartmentID"
                   :class="{ errorInput: isErrorInputDepartment }"
-                  :value="newEmployee.departmentID"
+                  :departmentName="departmentName"
                 ></ComboboxInput>
                 <!-- <select
                   bus="DepartmentId"
@@ -203,7 +209,7 @@
               <div class="row__input--label">Email</div>
               <div class="row__input--input">
                 <input
-                  v-model="newEmployee.Email"
+                  v-model="newEmployee.email"
                   :class="{ errorInput: isErrorInputEmail }"
                   class="input-email"
                   type="text"
@@ -271,7 +277,6 @@ import ThePopup from "./ThePopup.vue";
 export default {
   name: "TheDialog",
   props: ["employee", "employeeId", "text"],
-
   created() {
     this.$nextTick(function () {
       this.$refs.EmployeeCode.focus();
@@ -280,10 +285,10 @@ export default {
       console.log("add dữ liệu");
       //nếu dialog khởi tạo rỗng thì tự động lấy mã nhân viên mới.
       axios
-        .get("https://cukcuk.manhnv.net/api/v1/Employees/NewEmployeeCode")
+        .get("https://localhost:7067/api/v1/Employees/maxCodeEmployee")
         .then((res) => {
           document.querySelector(".input-id").value = res.data;
-          this.newEmployee.EmployeeCode = res.data;
+          this.newEmployee.employeeCode = res.data;
         })
         .catch((error) => console.log(error));
     } else {
@@ -299,6 +304,7 @@ export default {
       isErrorInputEmail: false,
       userMsg: "",
       isShowPopup: false,
+      departmentName: "",
     };
   },
   components: {
@@ -309,11 +315,12 @@ export default {
   methods: {
     /**
      * Hàm lấy id phòng ban từ combobox
+     * Author: Duy
      */
     handleDepartmentID(valueDepartment) {
       try {
-        this.newEmployee.DepartmentId = valueDepartment;
-        console.log(this.newEmployee.DepartmentId);
+        this.newEmployee.departmentId = valueDepartment;
+        console.log(this.newEmployee.departmentId);
       } catch (error) {
         console.log(error);
       }
@@ -339,26 +346,41 @@ export default {
         this.validateDialog();
         let isValid = this.validateDialog();
         if (isValid) {
-          console.log(this.newEmployee);
-          axios
-            .post(
-              "https://cukcuk.manhnv.net/api/v1/Employees",
-              this.newEmployee
-            )
-            .then((res) => {
-              console.log(res);
-              //gửi dữ liệu yêu cầu load lại data cho parent
-              this.closeDialog();
-              //gọi toast thông báo
-              this.$emit("callToast");
-              this.$emit("reload-data");
-            })
-            .catch((error) => {
-              this.userMsg = error.response.data.userMsg;
-              console.log(error.response.data.userMsg);
-
-              this.isShowPopup = true;
-            });
+          if (!this.isValueEmpty(this.employeeId)) {
+            axios
+              .post("https://localhost:7067/api/v1/Employees", this.newEmployee)
+              .then((res) => {
+                console.log(res);
+                this.closeDialog();
+                //gọi toast thông báo
+                this.$emit("callToast");
+                this.$emit("reload-data");
+                this.newEmployee = {};
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            // console.log(this.newEmployee.employeeId);
+            axios
+              .put(
+                `https://localhost:7067/api/v1/Employees/${this.newEmployee.employeeId}`,
+                this.newEmployee
+              )
+              .then((res) => {
+                console.log(res);
+                //gửi dữ liệu yêu cầu load lại data cho parent
+                console.log("thêm và đóng thành công");
+                this.closeDialog();
+                //gọi toast thêm mới thành công
+                this.$emit("callToast");
+                this.$emit("reload-data");
+                this.newEmployee = {};
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
         }
       } catch (error) {
         console.log(error);
@@ -384,9 +406,11 @@ export default {
       try {
         //Lấy dữ liệu từ api qua id
         axios
-          .get(`https://cukcuk.manhnv.net/api/v1/Employees/${this.employeeId}`)
+          .get(`https://localhost:7067/api/v1/Employees/${this.employeeId}`)
           .then((res) => {
             this.newEmployee = res.data;
+            this.departmentName = res.data.departmentName;
+            console.log(this.departmentName);
             this.$nextTick(function () {
               this.$refs.EmployeeCode.focus();
             });
@@ -409,10 +433,7 @@ export default {
         if (isValid) {
           if (!this.isValueEmpty(this.employeeId)) {
             axios
-              .post(
-                "https://cukcuk.manhnv.net/api/v1/Employees",
-                this.newEmployee
-              )
+              .post("https://localhost:7067/api/v1/Employees", this.newEmployee)
               .then((res) => {
                 console.log(res);
                 //gọi toast thông báo
@@ -427,7 +448,7 @@ export default {
             // console.log(this.newEmployee.employeeId);
             axios
               .put(
-                `https://cukcuk.manhnv.net/api/v1/Employees/${this.newEmployee.EmployeeId}`,
+                `https://localhost:7067/api/v1/Employees/${this.newEmployee.employeeId}`,
                 this.newEmployee
               )
               .then((res) => {
@@ -464,7 +485,7 @@ export default {
       try {
         let errors = [];
         //mã nv không được để trống
-        if (this.isValueEmpty(this.newEmployee.EmployeeCode) == false) {
+        if (this.isValueEmpty(this.newEmployee.employeeCode) == false) {
           errors.push("Mã nhân viên không được trống");
           this.isErrorInputCode = true;
           document.querySelector(".error-id").style.display = "block";
@@ -473,7 +494,7 @@ export default {
           document.querySelector(".error-id").style.display = "none";
         }
         //tên không đưỢc để trống
-        if (this.isValueEmpty(this.newEmployee.FullName) == false) {
+        if (this.isValueEmpty(this.newEmployee.employeeName) == false) {
           errors.push("Tên nhân viên không được trống");
           this.isErrorInputName = true;
           document.querySelector(".error-name").style.display = "block";
@@ -482,16 +503,16 @@ export default {
           document.querySelector(".error-name").style.display = "none";
         }
         //email không được để trống
-        if (this.isValueEmpty(this.newEmployee.Email) == false) {
-          errors.push("Email không được trống");
-          this.isErrorInputEmail = true;
-          document.querySelector(".error-email").style.display = "block";
-        } else {
-          this.isErrorInputEmail = false;
-          document.querySelector(".error-email").style.display = "none";
-        }
+        // if (this.isValueEmpty(this.newEmployee.Email) == false) {
+        //   errors.push("Email không được trống");
+        //   this.isErrorInputEmail = true;
+        //   document.querySelector(".error-email").style.display = "block";
+        // } else {
+        //   this.isErrorInputEmail = false;
+        //   document.querySelector(".error-email").style.display = "none";
+        // }
         //mã phòng ban không được để trống
-        if (this.isValueEmpty(this.newEmployee.DepartmentId) == false) {
+        if (this.isValueEmpty(this.newEmployee.departmentId) == false) {
           errors.push("Phòng ban không được trống");
           document.querySelector(".el-input__wrapper").style.borderColor =
             "red";
@@ -520,6 +541,7 @@ export default {
         if (value == "" || value == null || value == undefined) {
           return false;
         }
+
         return true;
       } catch (error) {
         console.log(error);

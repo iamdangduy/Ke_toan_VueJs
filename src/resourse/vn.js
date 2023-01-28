@@ -23,12 +23,12 @@ let EmployeeRS = {
 
     //Record
     Total: "Tổng",
-    Record: "Bản ghi",
+    Record: "bản ghi",
 
     //Paging
     Previous: "Trước",
     Next: "Sau",
-    RecordsInPage: "bản ghi trên một trang",
+    RecordsInPage: "bản ghi trên 1 trang",
 
     //Sidebar
     Overview: "Tổng quan",
@@ -45,6 +45,8 @@ let EmployeeRS = {
     General: "Tổng hợp",
     Budget: "Ngân sách",
     Report : "Báo cáo",
+
+    //combobox
 }
 
 export default EmployeeRS;

@@ -36,3 +36,7 @@ div.el-input__wrapper {
 .demo-form-inline {
   outline: none;
 }
+
+.el-select .el-input.is-focus .el-input__wrapper {
+  box-shadow: 0 0 0 0 #ff0000 inset!important;
+}
