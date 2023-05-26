@@ -1,4 +1,4 @@
-# amis.vue
+# vue
 
 ## Project setup
 ```
